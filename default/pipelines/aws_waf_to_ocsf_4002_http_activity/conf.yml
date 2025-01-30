@@ -1,0 +1,234 @@
+output: default
+streamtags:
+  - aws
+  - ocsf
+  - v1.3.0
+  - waf
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Parse raw and put into parsed field
+  - id: serde
+    filter: "true"
+    disabled: null
+    conf:
+      mode: extract
+      type: json
+      srcField: _raw
+      dstField: parsed
+      fieldFilterExpr: value !== '' && value !== null
+    final: false
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Fix httpRequest.headers arrays to be key:value pairs
+  - id: code
+    filter: Array.isArray(parsed.httpRequest.headers)
+    disabled: false
+    conf:
+      maxNumOfIterations: 5000
+      activeLogSampleRate: 1
+      useUniqueLogChannel: true
+      code: >-
+        const debug = false
+
+        function get_keys(object,name_field,value_field) {
+           var value;
+           Object.keys(object).some(function(k) {
+               debug && __e.debug.push(`working on ${k}`)
+               // if the object we're looking at is an array
+               // and the first member has a name property, we found one!
+               // Convert it
+               if (Array.isArray(object[k]) && Object.hasOwn(object[k][0],name_field)) {
+                   debug && __e.debug.push('found key/value pair')
+                  const arlen = object[k].length
+                  var tmp = {}
+                  for (let i = 0; i < arlen; ++i) {
+                    tmp[object[k][i][name_field]] = object[k][i][value_field]
+                  }
+                  object[k] = tmp
+               }
+               
+               // doesn't appear to be what we're looking for
+               // dig more if it's an object
+               else if (object[k] && typeof object[k] === 'object') {
+                   debug && __e.debug.push(`recurse with ${k}`)
+                   value = get_keys(object[k])
+               }
+           });
+           return value;
+        }
+
+
+        try {
+            __e.debug = debug ? [] : undefined
+            get_keys(__e.parsed.httpRequest,"name","value")
+        } catch(e) {
+            __e.CRIBLERR = e.message
+        }
+    final: false
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Flatten parsed field
+  - id: flatten
+    filter: "true"
+    disabled: null
+    conf:
+      fields:
+        - parsed
+      prefix: ""
+      depth: 10
+      delimiter: .
+    final: false
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Match flattened field names to those in the C.var dictionary, rename
+        and unflatten them
+  - id: code
+    filter: "true"
+    disabled: false
+    conf:
+      maxNumOfIterations: 5000
+      activeLogSampleRate: 1
+      useUniqueLogChannel: true
+      code: >-
+        // this function takes the flattened field names
+
+        // looks them up in the specified Global Variable (Knowledge -> Global Variables)
+
+        // renames them accordingly
+
+        // and finally unflattens them into ocsf{}
+
+
+        // update this to reflect the conversion you want
+
+        const gv = C.vars.ocsf_4002_aws_waf
+
+
+        const debug = false
+
+        function unflatten(data) {
+          var result = {}
+          for (var i in data) {
+            var keys = i.split('.')
+            keys.reduce(function(r, e, j) {
+              return r[e] || (r[e] = isNaN(Number(keys[j + 1])) ? (keys.length - 1 == j ? data[i] : {}) : [])
+            }, result)
+          }
+          return result
+        }
+
+
+
+        try {
+           __e.ocsf = {}
+           debug && (__e.debug = [])
+           for (let [name, value] of Object.entries(__e)) {
+              debug && __e.debug.push(name)
+              if (name.startsWith('parsed.')) {
+                 let old_name = name.slice(7)
+                 let new_name = gv[old_name]
+                 debug && __e.debug.push(`map: ${old_name} -> ${new_name}`)
+                 if (new_name) {
+                    __e.ocsf[new_name] = value
+                    delete __e[name]
+                 } else {
+                    __e.ocsf[`unmapped.extras.${old_name}`] = value
+                    delete __e[name]
+                 }
+              }
+           }
+           // now unflatten the result
+           Object.assign(__e,unflatten(__e.ocsf))
+           delete __e.ocsf
+        } catch (err) {
+           __e.CRIBLERR = err.toString()
+        }
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Fill out the rest of the requirements
+  - id: eval
+    filter: "true"
+    disabled: false
+    conf:
+      add:
+        - disabled: false
+          name: category_name
+          value: "'Network Activity'"
+        - disabled: false
+          name: category_uid
+          value: "4"
+        - disabled: false
+          name: class_name
+          value: "'HTTP Activity'"
+        - disabled: false
+          name: class_uid
+          value: "4002"
+        - disabled: false
+          name: activity_name
+          value: http_request.http_method
+        - disabled: false
+          name: raw_data
+          value: _raw
+        - disabled: false
+          name: metadata.version
+          value: /* convert to string */ `${metadata.version}`
+        - disabled: false
+          name: activity_id
+          value: "{Unknown: 0, CONNECT: 1, DELETE: 2, GET: 3, HEAD: 4, OPTIONS: 5, POST:
+            6, PUT: 7, TRACE: 8}[http_request.http_method.toUpperCase()] || 99"
+        - disabled: false
+          name: type_uid
+          value: class_uid*100+activity_id
+        - disabled: false
+          name: tls.version
+          value: /* not indicated in sample logs */ 'unknown'
+        - disabled: false
+          name: action_id
+          value: "{allo: 1, deni: 2}[action.slice(0,4).toLowerCase()] || 0"
+        - disabled: false
+          name: dst_endpoint
+          value: /* not indicated in sample logs */ {}
+        - disabled: false
+          name: http_response
+          value: "/* not indicated in sample logs */ { code: 0}"
+        - disabled: false
+          name: severity_id
+          value: /* not indicated in sample logs */ 0
+        - disabled: false
+          name: tls.ja3_hash.algorithm_id
+          value: /* not indicated in sample logs */ 0
+        - disabled: false
+          name: disposition
+          value: action
+        - disabled: false
+          name: disposition_id
+          value: "{allo: 1, bloc: 2, deni: 2, quar: 3, isol: 4, dele: 5, drop: 6, cust: 7,
+            appr: 8, rest: 9, reje: 25, unau: 26, error:
+            27}[action.slice(0,4).toLowerCase()]"
+        - disabled: false
+          name: http_request.url.scheme
+          value: /* not indicated in sample logs */ 'unknown'
+      remove:
+        - _*
+        - cribl_*
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf: {}
+    description: DEBUG STOP HERE
+    final: true
+description: Convert AWS WAF logs to OCSF HTTP Activity Class
+  https://schema.ocsf.io/1.3.0/classes/http_activity

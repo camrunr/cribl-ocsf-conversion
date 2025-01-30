@@ -1,0 +1,47 @@
+output: default
+streamtags: []
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      remove:
+        - "*"
+  - id: code
+    filter: "true"
+    disabled: null
+    conf:
+      maxNumOfIterations: 5000
+      activeLogSampleRate: 1
+      useUniqueLogChannel: true
+      code: >-
+        let csvData =
+        'event_field,ocsf_field,notes\naction,unmapped.action,\nhttpRequest.httpMethod,activity_name,\ntimestamp,_time,\nterminatingRuleID,firewall_rule.name,\nterminatingRuleType,firewall_rule.type,\nhttpRequest.headers.X-Forwarded-Proto,http_request.url.scheme,\nhttpRequest.headers.host,http_request.url.hostname,\nhttpRequest.uri,http_request.url.path,\nhttpRequest.headers.X-Forwarded-For,http_request.x_forwarded_for,\nhttpRequest.httpMethod,http_request.http_method,\nhttpRequest.args,http_request.args,\nhttpRequest.httpVersion,http_request.version,\nhttpRequest.requestId,http_request.uid,\nhttpRequest.headers.user-agent,http_request.user_agent,\nhttpRequest.headers.referer,http_request.referrer,\nresponseCodeSent,http_response.code,\nhttpRequest.headers.content-length,http_response.length,\nhttpRequest.headers.content-type,http_response.content_type,\nstatus,http_response.status,\nhttpSourceName,metadata.product,\nwebaclId,metadata.product.feature.uid,\nformatVersion,metadata.version,\nhttpRequest.country,src_endpoint.location.country,\nhttpRequest.clientIp,src_endpoint.ip,\nja3Fingerprint,tls.ja3_hash,\nhttpRequest.headers.bytes,traffic.bytes_out'
+
+
+        // Split the CSV data into lines
+
+        const lines = csvData.trim().split('\n');
+
+
+        // Initialize an empty object to hold the dictionary
+
+        const dictionary = {};
+
+
+        // Iterate over each line, starting from the second line (index 1) to skip the header
+
+        for (let i = 1; i < lines.length; i++) {
+            const [event_field, ocsf_field, notes] = lines[i].split(',').map(item => item.trim());
+            // Add to the dictionary with event_field as the key
+            dictionary[event_field] = ocsf_field
+        }
+
+
+        // Output the resulting dictionary
+
+        Object.assign(__e,dictionary)
+description: Use this pipeline to convert a lookup to a JSON dict in the preview
+  window. Copy paste the resulting object into Knowledge->Global Vars

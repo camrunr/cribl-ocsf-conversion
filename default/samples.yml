@@ -1,0 +1,17 @@
+LtgXbY:
+  sampleName: aws_waf.json
+  created: 1734120459246
+  size: 17135
+  numEvents: 5
+DsG2Rw:
+  sampleName: okta-capture-one.json
+  created: 1734478730914
+  isPackOnly: true
+  size: 2805
+  numEvents: 1
+UIOtmu:
+  sampleName: proofpoint_tap.json
+  created: 1738187565353
+  isPackOnly: true
+  size: 1888
+  numEvents: 1

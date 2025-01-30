@@ -1,0 +1,150 @@
+ocsf_4002_aws_waf:
+  type: object
+  lib: custom
+  value: |-
+    {
+      action: 'action',
+      'httpRequest.httpMethod': 'http_request.http_method',
+      timestamp: 'time',
+      terminatingRuleId: 'firewall_rule.name',
+      terminatingRuleType: 'firewall_rule.type',
+      'httpRequest.headers.X-Forwarded-Proto': 'http_request.url.scheme',
+      'httpRequest.headers.host': 'http_request.url.hostname',
+      'httpRequest.uri': 'http_request.url.path',
+      'httpRequest.headers.X-Forwarded-For': 'http_request.x_forwarded_for',
+      'httpRequest.args': 'http_request.args',
+      'httpRequest.httpVersion': 'http_request.version',
+      'httpRequest.requestId': 'http_request.uid',
+      'httpRequest.headers.user-agent': 'http_request.user_agent',
+      'httpRequest.headers.referer': 'http_request.referrer',
+      responseCodeSent: 'http_response.code',
+      'httpRequest.headers.content-length': 'http_response.length',
+      'httpRequest.headers.content-type': 'http_response.content_type',
+      status: 'http_response.status',
+      httpSourceName: 'metadata.product.vendor_name',
+      webaclId: 'metadata.product.feature.uid',
+      formatVersion: 'metadata.version',
+      'httpRequest.country': 'src_endpoint.location.country',
+      'httpRequest.clientIp': 'src_endpoint.ip',
+      ja3Fingerprint: 'tls.ja3_hash.value',
+      'httpRequest.headers.bytes': 'traffic.bytes_out'
+    }
+  description: Conversion dictionary for AWS WAF logs to OCSF 4002 HTTP Activity
+  tags: ocsf,v1.3.0,aws,waf
+ocsf_3002_okta_system_authentication:
+  type: object
+  lib: custom
+  value: >-
+    {
+      "eventType": "activity_name",
+      "actor.alternateId": "user.email_addr",
+      "actor.displayName": "user.name",
+      "actor.id": "user.uid",
+      "actor.type": "user.type",
+      "authenticationContext.externalSessionId": "actor.session.uid",
+      "authenticationContext.issuer.id": "actor.session.issuer",
+      "client.device": "src_endpoint.type",
+      "client.geographicalContext.city": "src_endpoint.location.city",
+      "client.geographicalContext.country": "src_endpoint.location.country",
+      "client.geographicalContext.geolocation.lat": "src_endpoint.location.lat",
+      "client.geographicalContext.geolocation.lon": "src_endpoint.location.long",
+      "client.geographicalContext.postalCode": "src_endpoint.location.postal_code",
+      "client.ipAddress": "src_endpoint.ip",
+      "client.userAgent.os": "src_endpoint.os.name",
+      "client.userAgent.rawUserAgent": "http_request.user_agent",
+      "debugContext.debugData.requestId": "http_request.uid",
+      "debugContext.debugData.url": "dst_endpoint.svc_name",
+      "device.id": "device.uid",
+      "device.name": "device.name",
+      "device.os_platform": "device.type",
+      "displayMessage": "message",
+      "outcome.result": "status",
+      "published": "time",
+      "securityContext.asNumber": "src_endpoint.autonomous_system.number",
+      "securityContext.asOrg": "src_endpoint.autonomous_system.name",
+      "securityContext.domain": "src_endpoint.domain",
+      "securityContext.isp": "src_endpoint.location.isp",
+      "transaction.type": "logon_type",
+      "uuid": "metadata.uid",
+      "version": "metadata.product.version"
+    }
+  description: Conversion dictionary for AWS WAF logs to OCSF 4002 HTTP Activity
+  tags: ocsf,v1.3.0,okta,authentication
+testing_actor:
+  type: object
+  lib: custom
+  value: |-
+    {
+    'actor.displayName':'actor.user.name',
+    'actor.alternateId':'actor.user.email_addr',
+    'actor.id':'actor.user.uid',
+    'authenticationContext.externalSessionId':'actor.session.uid',
+    'authenticationContext.issuer.id':'actor.session.issuer',
+    'debugContext.debugData.url':'dst_endpoint.svc_name',
+    'device.id':'device.uid',
+    'device.name':'device.name',
+    'displayMessage':'message',
+    'eventType':'metadata.event_code',
+    'version':'metadata.product.version',
+    'uuid':'metadata.uid',
+    'published':'time',
+    'debugContext.debugData.requestId':'http_request.uid',
+    'client.userAgent.rawUserAgent':'http_request.user_agent',
+    'client.ipAddress':'src_endpoint.ip',
+    'securityContext.domain':'src_endpoint.domain',
+    'client.device':'src_endpoint.type',
+    'client.geographicalContext.city':'src_endpoint.location.city',
+    'client.geographicalContext.geolocation.lat':'src_endpoint.location.lat',
+    'client.geographicalContext.geolocation.lon':'src_endpoint.location.long',
+    'client.geographicalContext.country':'src_endpoint.location.country',
+    'securityContext.isp':'src_endpoint.location.isp',
+    'client.geographicalContext.postalCode':'src_endpoint.location.postal_code',
+    'securityContext.asOrg':'src_endpoint.autonomous_system.name',
+    'securityContext.asNumber':'src_endpoint.autonomous_system.number',
+    'client.userAgent.os': 'src_endpoint.os.name',
+    'device.os_platform': 'device.type',
+    'outcome.result': 'status',
+    'transaction.type': 'logon_type',
+    'actor.type':'actor.user.type',
+    'actor.displayName': 'actor.user.name',
+    'actor.alternateId': 'actor.user.email_addr',
+    'actor.id':'actior.user.uid',
+    'eventType': 'activity_name'
+    }
+  description: Conversion dictionary for AWS WAF logs to OCSF 4002 HTTP Activity
+  tags: ocsf,v1.3.0,okta,authentication
+ocsf_4009_proofpoint_tap:
+  type: object
+  lib: custom
+  value: |-
+    {
+        'messageTime': 'time',
+        'messageSize': 'email.size',
+        'message': 'message',
+        // email object
+        'subject': 'email.subject',
+        'messageID': 'email.message_uid',
+        'replyToAddress': 'email.reply_to',
+        'recipient': 'email.smtp_to',
+        'sender': 'email.smtp_from',
+        // unmapped values 
+        'cluster': 'unmapped.cluster',
+        'completelyRewritten': 'unmapped.completelyRewritten',
+        'spamScore': 'unmapped.spamScore',
+        'malwareScore': 'unmapped.malwareScore',
+        'imposterScpre': 'unmapped.imposterScore',
+        'headerFrom': 'unmapped.headerFrom',
+        'headerReplyTo': 'unmapped.headerReplyTo',
+        'messageParts': 'unmapped.messageParts',
+        'modulesRun': 'unmapped.modulesRun',
+        'phishScore': 'unmapped.phishScore',
+        'policyRoutes': 'unmapped.policyRoutes',
+        'QID': 'unmapped.QID',
+        'quarantineFolder': 'unmapped.quarantineFolder',
+        'quarantineRule': 'unmapped.quarantineRule',
+        'senderIP': 'unmapped.senderIP',
+        'threatInfoMap': 'unmapped.threatInfoMap',
+        'xmailer': 'unmapped.xmailer',
+    }
+  tags: ocsf,v1.3.0,proofpoint
+  description: Conversion dictionary for proofpoint logs to OCSF 4009 Email Activity

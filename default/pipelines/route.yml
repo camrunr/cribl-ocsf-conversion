@@ -1,0 +1,48 @@
+id: default
+groups: {}
+comments: []
+routes:
+  - id: YikgJl
+    name: AWS WAF
+    final: true
+    disabled: false
+    pipeline: aws_waf_to_ocsf_4002_http_activity
+    description: ""
+    clones: []
+    enableOutputExpression: false
+    outputExpression: null
+    filter: sourcetype == 'aws:waf'
+    output: default
+  - id: Zq9vFw
+    name: Okta System Auth
+    final: true
+    disabled: false
+    pipeline: okta_system_authentication_to_ocsf_3002_authentication
+    description: ""
+    clones: []
+    enableOutputExpression: false
+    outputExpression: null
+    filter: sourcetype.startsWith('okta')
+    output: default
+  - id: pV2AgX
+    name: Proofpoint
+    final: true
+    disabled: false
+    pipeline: proofpoint_tap_to_ocsf_4009_email_activity
+    description: ""
+    clones: []
+    enableOutputExpression: false
+    outputExpression: null
+    filter: sourcetype.startswith('proofpoint')
+    output: default
+  - id: default
+    name: default
+    final: true
+    disabled: false
+    pipeline: main
+    description: ""
+    clones: []
+    enableOutputExpression: false
+    outputExpression: null
+    filter: "true"
+    output: default
