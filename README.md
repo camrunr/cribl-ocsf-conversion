@@ -9,16 +9,19 @@ Use this Pack to convert specific log types to OCSF schema. At this time the fol
 
 **This is a work in progress!** Use with Caution.
 
+## Installation
 
-## Requirements Section
+See "Contributing to the Pack" below for using github integrations to install, upgrade, and contribute to the Pack
 
-#### AWS WAF logs
+#### Requirements Section
+
+## AWS WAF logs
 Most often they would be collected from an S3 bucket. They should be in JSON format. [Example](https://docs.aws.amazon.com/waf/latest/developerguide/logging-examples.html). There is an example included with the Pack.
 
-#### Okta System Authentication logs
+## Okta System Authentication logs
 These are commonly collected from the Okta API. They should be in JSON format.
 
-#### Proofpoint TAP logs
+## Proofpoint TAP logs
 Currently the pack supports those logs collected via API in JSON format. Syslog style may come at a later date.
 
 ## Using The Pack
@@ -38,8 +41,29 @@ However, the simple translations of names are never enough for the complexity of
    a. You may need to adjust the in-Pack routes to match events to the correct pipeline
 3. You can define Schema and use the C.Schema() validation method to check your logs. However, this is a heavy function. Use with caution. 
 
+# Contributing to the Pack
 
-# Release Notes
+As of Cribl 4.13 you can install, upgrade and contribute to a pack directly through git. Below are instructions for doing this with Github. I recommend usually forking into your repo and pushing changes there to encourage collaboration and better change management.
+
+* Fork this Pack from the [main repo](https://github.com/camrunr/cribl-ocsf-conversion) into your own repo
+* Create a [fine-grained access token per GitHub's instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token)
+* In Cribl go to Packs -> Add Pack -> Import from Git
+   * Enter the repo URL as `https://username:token@uri`
+      * Example: `https://myuser:somecrazytoken@github.com/myuser/my-forked-pack-repo`
+   * Click Import 
+* You can sync your fork with the main release in github's interface
+   * ie, any new changes in the main release will be pulled down into your repo
+* You can sync your installation in Cribl with your fork by using the Upgrade option in the Packs inteface or API
+   * ie, any changes present in your repo will be pulled into Cribl
+* You can sync changes in your installed Pack to your fork by using the Publish to Git option in the Packs interface or API
+   * ie, any changes made locally in Cribl will be pushed up to your fork repo
+   * If you think your changes will benefit others in the community, you can issue a PR to the original repo
+
+## Release Notes
+
+### Version 0.5.1 - 2025-08-25
+- No functional changes made!
+- Updated this readme (only) to include github integration instructions
 
 ### Version 0.5.0 - 2025-01-30
 - Added Proofpoint
@@ -50,9 +74,6 @@ However, the simple translations of names are never enough for the complexity of
 
 ### Version 0.1.0 - 2024-12-13
 - Initial release with AWS WAF capabilities
-
-# Contributing to the Pack
-To contribute to the Pack fork the repo and submit a PR
 
 # License
 This Pack uses the Apache license. Do whatchalike.

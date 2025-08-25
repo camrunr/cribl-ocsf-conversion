@@ -1,1 +1,1 @@
-{"name":"cribl-ocsf-conversion","version":"0.5.0","minLogStreamVersion":"4.9.0","author":"Jon Rust <jrust@cribl.io)","description":"Convert select log sources to OCSF","displayName":"cribl-ocsf-conversion","tags":{"streamtags":["ocsf","aws","waf","okta","proofpoint"]}}
+{"name":"cribl-ocsf-conversion","version":"0.5.1","minLogStreamVersion":"4.9.0","author":"Jon Rust <jrust@cribl.io)","description":"Convert select log sources to OCSF","displayName":"cribl-ocsf-conversion","tags":{"streamtags":["ocsf","aws","waf","okta","proofpoint"]}}
